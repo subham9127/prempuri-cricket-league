@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prempuri Cricket League Registration</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url("https://thegodofsports.com/wp-content/uploads/2023/06/indian-cricket.jpg") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+      width: 350px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #1c87c9;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background: #155a8a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Prempuri Cricket League 🏏</h2>
+    <form id="playerForm">
+      <input type="text" id="name" placeholder="Player Name" required>
+      <input type="text" id="fatherName" placeholder="Father's Name" required>
+      <input type="text" id="mobile" placeholder="Mobile Number" required>
+      <select id="tshirt" required>
+        <option value="">Select T-Shirt Size</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+      </select>
+      <input type="number" id="jersey" placeholder="Jersey Number" min="0" required>
+      <button type="submit">Pay ₹250 & Register</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("playerForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const playerData = {
+        name: document.getElementById("name").value,
+        fatherName: document.getElementById("fatherName").value,
+        mobile: document.getElementById("mobile").value,
+        tshirt: document.getElementById("tshirt").value,
+        jersey: document.getElementById("jersey").value,
+      };
+
+      // Create Razorpay order
+      const orderRes = await fetch("http://localhost:3000/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const order = await orderRes.json();
+
+      var options = {
+        key: "YOUR_RAZORPAY_KEY_ID", // Replace with your Razorpay key
+        amount: order.amount,
+        currency: order.currency,
+        name: "Prempuri Cricket League",
+        description: "Tournament Entry Fee",
+        order_id: order.id,
+        handler: async function (response) {
+          const verifyRes = await fetch("http://localhost:3000/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              playerData,
+            }),
+          });
+          const result = await verifyRes.json();
+          if (result.success) {
+            alert("✅ Registration Successful!");
+          } else {
+            alert("❌ Payment Failed!");
+          }
+        },
+        theme: { color: "#1c87c9" }
+      };
+
+      var rzp1 = new Razorpay(options);
+      rzp1.open();
+    });
+  </script>
+</body>
+</html>
