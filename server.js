@@ -6,7 +6,8 @@ const dotenv = require("dotenv");
 const crypto = require("crypto");
 const cors = require("cors");
 
-dotenv.config();
+dotenv.config(); // Load .env variables
+
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -29,10 +30,12 @@ app.post("/create-order", async (req, res) => {
     currency: "INR",
     receipt: "receipt_order_" + Date.now(),
   };
+
   try {
     const order = await razorpay.orders.create(options);
     res.json(order);
   } catch (err) {
+    console.error(err);
     res.status(500).send(err);
   }
 });
@@ -55,11 +58,13 @@ app.post("/verify-payment", async (req, res) => {
     try {
       await workbook.xlsx.readFile(filePath);
     } catch (e) {
+      // File doesn't exist, create new worksheet
       workbook.addWorksheet("Players");
     }
 
     const worksheet = workbook.getWorksheet("Players") || workbook.addWorksheet("Players");
 
+    // Add headers if sheet is empty
     if (worksheet.rowCount === 1) {
       worksheet.addRow(["Name", "Father Name", "Mobile", "T-Shirt Size", "Payment ID"]);
     }
@@ -78,9 +83,10 @@ app.post("/verify-payment", async (req, res) => {
   } else {
     res.status(400).json({ success: false, message: "Payment verification failed ❌" });
   }
-}); // ✅ closes app.post
+});
 
 // ✅ Start server
-app.listen(3000, () => {
-  console.log("✅ Server running on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
