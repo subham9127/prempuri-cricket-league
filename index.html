@@ -90,7 +90,15 @@
         <option value="XXL">XXL</option>
       </select>
       <input type="number" id="jersey" placeholder="Jersey Number" min="0" required>
-      <button type="submit">Pay ₹250 & Register</button>
+      <select id="lower" required>
+      <option value="">Select lower Size</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+      </select>
+      <button type="submit">Pay ₹300 & Register</button>
     </form>
     <div id="message"></div>
   </div>
@@ -149,6 +157,7 @@
         mobile: document.getElementById("mobile").value,
         tshirt: document.getElementById("tshirt").value,
         jersey: document.getElementById("jersey").value,
+        lower : document.getElementById("lower").value,
       };
 
       try {

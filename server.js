@@ -25,7 +25,7 @@ const razorpay = new Razorpay({
 // ✅ Create order (₹250)
 app.post("/create-order", async (req, res) => {
   const options = {
-    amount: 250 * 100, // in paise
+    amount: 300 * 100, // in paise
     currency: "INR",
     receipt: "receipt_order_" + Date.now(),
   };
@@ -61,7 +61,7 @@ app.post("/verify-payment", async (req, res) => {
     const worksheet = workbook.getWorksheet("Players") || workbook.addWorksheet("Players");
 
     if (worksheet.rowCount === 1) {
-      worksheet.addRow(["Name", "Father Name", "Mobile", "T-Shirt Size", "Payment ID"]);
+      worksheet.addRow(["Name", "Father Name", "Mobile", "T-Shirt Size", "lowersize", "Payment ID"]);
     }
 
     worksheet.addRow([
@@ -69,9 +69,11 @@ app.post("/verify-payment", async (req, res) => {
       playerData.fatherName,
       playerData.mobile,
       playerData.tshirt,
+      playerData.tshirtsize,
+      playerData.lowersize,
       razorpay_payment_id,
     ]);
-
+    
     await workbook.xlsx.writeFile(filePath);
 
     res.json({ success: true, message: "Payment verified & data saved ✅" });
